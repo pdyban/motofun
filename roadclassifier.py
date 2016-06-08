@@ -4,6 +4,9 @@ import numpy as np
 
 
 class RoadClassifier(object):
+    """
+    Converts list of nodes to a graph, computes a score for each edge in the graph.
+    """
     def __init__(self):
         super().__init__()
 
@@ -40,7 +43,7 @@ class VectorAngleRoadClassifier(RoadClassifier):
                 from math import pi
                 return angle*pi/180.0
 
-            from math import sin, cos, pi, sqrt, atan2
+            from math import sin, cos, sqrt, atan2
             lat1, lon1 = p0
             lat2, lon2 = p1
             R = 6371 # km
@@ -55,43 +58,49 @@ class VectorAngleRoadClassifier(RoadClassifier):
             return d
 
         points = []
-        fun_classes = []
+        # fun_classes = []
+        g = {}  # graph
         for path in nodes:
             intensity = [0]*len(path)
             total_spass = 0.0
             total_distance = 0.0
             for index in range(len(path)-2):
-                p0 = np.array(path[index],dtype=np.float)
-                p1 = np.array(path[index+1],dtype=np.float)
-                p2 = np.array(path[index+2],dtype=np.float)
-                # intens = np.linalg.norm(p0-p2)/(np.linalg.norm(p0-p1) + np.linalg.norm(p2-p1))
-                # intens = approximate_parabole(p0,p1,p2)
-                intens = calculate_angle(p0,p1,p2)
-                intensity[index+1] = intens
-                points.append([p1, intens])
-                total_spass += intens
-                # print(convert_to_meters(p0, p1))
-                total_distance += convert_to_meters(p0, p1)
+                p0 = path[index]
+                p1 = path[index+1]
+                p2 = path[index+2]
+                p0_float = np.array(p0, dtype=np.float)
+                p1_float = np.array(p1, dtype=np.float)
+                p2_float = np.array(p2, dtype=np.float)
+                fun_factor = calculate_angle(p0_float, p1_float, p2_float)
+                intensity[index+1] = fun_factor
+                points.append([p1, fun_factor])
+                total_spass += fun_factor
+                if p0 not in g:
+                    g[p0] = {}
+                g[p0][p1] = fun_factor
 
-            if total_distance < 0.01:
-                continue
+            # close the path with the last two points
+            if len(path) > 2:
+                p0 = path[-2]
+                p1 = path[-1]
+                if p0 not in g:
+                    g[p0] = {}
 
-            # print('total ' + str(total_spass/total_distance))
-            total_spass /= total_distance
-            total_spass *= 1000.0
-            if total_spass > 10:
-                c = 'black'
-            elif total_spass > 6:
-                c = 'red'
-            elif total_spass > 3:
-                c = 'green'
-            elif total_spass > 1:
-                c = 'blue'
-            else:
-                c = 'gray'
-            fun_classes.append(c)
+                g[p0][p1] = 0.0
 
-        return (nodes, fun_classes)
+            # if total_spass > 10:
+            #     c = 'black'
+            # elif total_spass > 6:
+            #     c = 'red'
+            # elif total_spass > 3:
+            #     c = 'green'
+            # elif total_spass > 1:
+            #     c = 'blue'
+            # else:
+            #     c = 'gray'
+            # fun_classes.append(c)
+
+        return g
 
 
 class TriangleRoadClassifier(RoadClassifier):

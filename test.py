@@ -27,10 +27,15 @@ class TestRoadClassifiers(unittest.TestCase):
         self.nodes = QueryRoadCollector().get_roads(query)
 
     def test_vector_angle_classifier(self):
-        c = VectorAngleRoadClassifier().get_classification(self.nodes)
-        self.assertEqual(len(c), 2)  # consists of list of road points aka nodes, and the fun factor list
-        self.assertEqual(len(c[0]), len(self.nodes))  # list of road points should not change due to classification
-        self.assertEqual(len(c[1]), len(c[0]))  # fun factor list should contain a value for each road point
+        graph = VectorAngleRoadClassifier().get_classification(self.nodes)
+        self.assertEqual(len(graph), 56)  # consists of list of road points aka nodes
+        self.assertIsInstance(graph, dict)
+        # for node in graph:
+        #     for other_node in graph[node]:
+        #         print('+ %s -> %s : %.2f' % (node, other_node, graph[node][other_node]))
+
+        # self.assertEqual(len(c[0]), len(self.nodes))  # list of road points should not change due to classification
+        # self.assertEqual(len(c[1]), len(c[0]))  # fun factor list should contain a value for each road point
 
 
 @unittest.skip
