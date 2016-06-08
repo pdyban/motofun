@@ -1,9 +1,11 @@
 __author__ = 'missoni'
 
+import numpy as np
+
 
 class RoadClassifier(object):
     def __init__(self):
-        super(self.__class__, self).__init__()
+        super().__init__()
 
     def get_classification(self, nodes):
         """
@@ -16,7 +18,7 @@ class RoadClassifier(object):
 
 class VectorAngleRoadClassifier(RoadClassifier):
     def __init__(self):
-        super(self.__class__, self).__init__()
+        super().__init__()
 
     def get_classification(self, nodes):
         """not finished yet"""
@@ -94,7 +96,7 @@ class VectorAngleRoadClassifier(RoadClassifier):
 
 class TriangleRoadClassifier(RoadClassifier):
     def __init__(self):
-        super(self.__class__, self).__init__()
+        super().__init__()
 
     def get_classification(self, nodes):
         raise NotImplemented("Implement me!")
