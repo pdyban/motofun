@@ -3,7 +3,7 @@ __author__ = 'missoni'
 
 class RoadCollector(object):
     def __init__(self):
-        super(self.__class__, self).__init__()
+        super().__init__()
 
     def get_roads(self, *args, **kwargs):
         raise NotImplemented("Implement me in children!")
@@ -11,7 +11,7 @@ class RoadCollector(object):
 
 class QueryRoadCollector(RoadCollector):
     def __init__(self):
-        super(self.__class__, self).__init__()
+        super().__init__()
 
     def get_roads(self, query):
         import overpy
@@ -21,8 +21,8 @@ class QueryRoadCollector(RoadCollector):
         nodes = []
 
         for way in result.ways:
-            print("Name: %s" % way.tags.get("name", "n/a"))
-            print("\tHighway: %s" % way.tags.get("highway", "n/a"))
+            # print("Name: %s" % way.tags.get("name", "n/a"))
+            # print("\tHighway: %s" % way.tags.get("highway", "n/a"))
 
             nodes_ = []
             for node in way.get_nodes(resolve_missing=True):
@@ -35,7 +35,7 @@ class QueryRoadCollector(RoadCollector):
 
 class BoundingBoxRoadCollector(RoadCollector):
     def __init__(self):
-        super(self.__class__, self).__init__()
+        super().__init__()
 
     def get_roads(self, bbox):
         raise NotImplemented("Implement me!")
