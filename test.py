@@ -1,11 +1,9 @@
-__author__ = 'missoni'
-
 import unittest
 from roadcollector import *
 from roadclassifier import *
+from routebuilder import *
 
 
-@unittest.skip
 class TestRoadCollectors(unittest.TestCase):
     def test_query_road_by_id(self):
         query = """way(47081339);out;"""
@@ -33,6 +31,17 @@ class TestRoadClassifiers(unittest.TestCase):
         self.assertEqual(len(c), 2)  # consists of list of road points aka nodes, and the fun factor list
         self.assertEqual(len(c[0]), len(self.nodes))  # list of road points should not change due to classification
         self.assertEqual(len(c[1]), len(c[0]))  # fun factor list should contain a value for each road point
+
+
+@unittest.skip
+class TestRouteBuilders(unittest.TestCase):
+    def setUp(self):
+        query = """way(47081339);out;"""
+        self.nodes = QueryRoadCollector().get_roads(query)
+        self.classes = VectorAngleRoadClassifier().get_classification(self.nodes)
+
+    def test_build_shortest_route(self):
+        rb = RouteBuilder()
 
 
 if __name__ == '__main__':
