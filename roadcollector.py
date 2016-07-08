@@ -1,4 +1,4 @@
-__author__ = 'missoni'
+from roadgraph import RoadGraph
 
 
 class RoadCollector(object):
@@ -20,6 +20,9 @@ class QueryRoadCollector(RoadCollector):
 
         nodes = []
 
+        # store waypoints as a graph
+        g = RoadGraph()
+
         for way in result.ways:
             # print("Name: %s" % way.tags.get("name", "n/a"))
             # print("\tHighway: %s" % way.tags.get("highway", "n/a"))
@@ -29,6 +32,9 @@ class QueryRoadCollector(RoadCollector):
                 nodes_.append((node.lat, node.lon,))
 
             nodes.append(nodes_)
+
+            # store waypoints as a graph
+            g.append_way(nodes_)
 
         return nodes
 
