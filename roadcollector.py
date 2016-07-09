@@ -36,7 +36,7 @@ class QueryRoadCollector(RoadCollector):
             # store waypoints as a graph
             g.append_way(nodes_)
 
-        return nodes
+        return g
 
 
 class BoundingBoxRoadCollector(RoadCollector):
