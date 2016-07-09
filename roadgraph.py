@@ -31,6 +31,6 @@ class RoadGraph(defaultdict):
         """
         Traverses the road graph and returns pairs of neighboring waypoints.
         """
-        for node, folloing_nodes in self.items():
+        for node, following_nodes in self.items():
             for fn in folloing_nodes:
                 yield (node, fn)
