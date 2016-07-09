@@ -26,3 +26,11 @@ class RoadGraph(defaultdict):
             x.append([node[0]] + [n[0] for n in nodes])
             y.append([node[1]] + [n[1] for n in nodes])
         return x, y
+
+    def traverse(self):
+        """
+        Traverses the road graph and returns pairs of neighboring waypoints.
+        """
+        for node, folloing_nodes in self.items():
+            for fn in folloing_nodes:
+                yield (node, fn)
