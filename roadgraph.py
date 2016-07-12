@@ -24,15 +24,17 @@ class RoadGraph(defaultdict):
         # if nodes[-1] not in self:
         #    self[nodes[-1]] = {}
 
-    def traverse(self):
-        """
-        Traverses the road graph and returns pairs of neighboring waypoints.
-
-        :rtype iterator
-        """
-        for node, following_nodes in self.items():
-            for fn in following_nodes:
-                yield (node, fn)
+    # this function has been deprecated
+    # use traverse_paths(1) instead
+    # def traverse(self):
+    #     """
+    #     Traverses the road graph and returns pairs of neighboring waypoints.
+    #
+    #     :rtype iterator
+    #     """
+    #     for node, following_nodes in self.items():
+    #         for fn in following_nodes:
+    #             yield (node, fn)
 
     def traverse_paths(self, node=None, length=1):
         """
@@ -63,21 +65,21 @@ class RoadGraph(defaultdict):
                             yield [node] + path
 
     # mirror is not useful for double-directed graphs
-    def mirror(self):
-        """
-        Generates a mirrored graph, i.e. a graph (with the same number of nodes)
-        whose edges are directed in the inverse direction to the given graph.
-
-        :return: the mirrored graph
-        :rtype: RoadGraph
-        """
-        mirrored_graph = RoadGraph()
-        for path in self.traverse_paths(length=1):
-            start, finish = path
-            mirrored_graph[finish][start] = self[start][finish]
-            if start not in mirrored_graph:
-                mirrored_graph[start] = {}
-        return mirrored_graph
+    # def mirror(self):
+    #     """
+    #     Generates a mirrored graph, i.e. a graph (with the same number of nodes)
+    #     whose edges are directed in the inverse direction to the given graph.
+    #
+    #     :return: the mirrored graph
+    #     :rtype: RoadGraph
+    #     """
+    #     mirrored_graph = RoadGraph()
+    #     for path in self.traverse_paths(length=1):
+    #         start, finish = path
+    #         mirrored_graph[finish][start] = self[start][finish]
+    #         if start not in mirrored_graph:
+    #             mirrored_graph[start] = {}
+    #     return mirrored_graph
 
     def find_next_node(self, prev_node, cur_node):
         """
@@ -112,7 +114,7 @@ class RoadGraph(defaultdict):
         by connecting the preceding node to the following.
 
         :param copy: should create a copy of the graph; if False, will overwrite current graph
-        :return: the simplified graph, where each node has more than 1 child, or zero (if end node).
+        :return: the simplified graph, where each node has more than 1 child, or 1 (if it is an end node).
         :rtype: RoadGraph
         """
         if copy:

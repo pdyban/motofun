@@ -77,18 +77,18 @@ class TestRoadGraph(unittest.TestCase):
         self.assertEqual(len(paths), 2*10)  # double the number because the graph is double-sided directed
 
     # mirror is not useful for double-directed graphs
-    @unittest.skip
-    def test_mirror(self):
-        length = len(self.graph)
-        mirrored_graph = self.graph.mirror()
-        self.assertEqual(len(self.graph), length)  # the original graph has not been modified
-        self.assertEqual(len(mirrored_graph), len(self.graph))  # the mirrored graph has the same number of nodes
-        for node in mirrored_graph:
-            self.assertIn(node, self.graph)  # each node from the mirrored graph is in the original graph
-            # cardinality of the mirrored node should be equal to the total number of nodes
-            # that reference that node in the original graph
-            self.assertEqual(len(mirrored_graph[node]),
-                             sum(1 for n in self.graph if n in self.graph and node in self.graph[n]))
+    # @unittest.skip
+    # def test_mirror(self):
+    #     length = len(self.graph)
+    #     mirrored_graph = self.graph.mirror()
+    #     self.assertEqual(len(self.graph), length)  # the original graph has not been modified
+    #     self.assertEqual(len(mirrored_graph), len(self.graph))  # the mirrored graph has the same number of nodes
+    #     for node in mirrored_graph:
+    #         self.assertIn(node, self.graph)  # each node from the mirrored graph is in the original graph
+    #         # cardinality of the mirrored node should be equal to the total number of nodes
+    #         # that reference that node in the original graph
+    #         self.assertEqual(len(mirrored_graph[node]),
+    #                          sum(1 for n in self.graph if n in self.graph and node in self.graph[n]))
 
     def test_find_next_node(self):
         length, last_node, path = self.graph.find_next_node((0, 0), (0, 1))
