@@ -15,6 +15,14 @@ class TestRoadGraph(unittest.TestCase):
         self.graph.append_way([(0, 0), (2, 1)])
         self.graph.append_way([(1, 1), (3, 2), (3, 3)])
         self.graph.append_way([(3, 2), (4, 3)])
+    
+    def test_edge_is_double_directed(self):
+        """
+        Every edge should be directed in both directions.
+        """
+        for path in self.graph.traverse_paths():
+            start, finish = path
+            self.assertIn(start, self.graph[finish])
 
     def test_traverse_two_segment_paths_from_source(self):
         """
