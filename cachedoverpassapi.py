@@ -1,5 +1,6 @@
 import overpy
 import sqlite3
+import pickle
 
 
 class CachedOverpassAPI(overpy.Overpass):
@@ -13,7 +14,6 @@ class CachedOverpassAPI(overpy.Overpass):
         self.cursor = None  # database cursor for executing queries
 
         self.connect_to_db(dbfile)
-        self.create_empty_cache()  # will quietly do nothing if cache table already exists
 
     def clear_cache(self):
         """
@@ -37,6 +37,7 @@ class CachedOverpassAPI(overpy.Overpass):
         :param dbfile: path to dbfile (sqlite)
         """
         self.conn = sqlite3.connect(dbfile)
+        self.create_empty_cache()  # will quietly do nothing if cache table already exists
 
     def query(self, query):
         """
@@ -56,9 +57,8 @@ class CachedOverpassAPI(overpy.Overpass):
 
     def store_to_cache(self, query, result):
         cursor = self.conn.cursor()
-        cursor.execute("INSERT INTO CachedQueries (Query, Result) VALUES ('%(query)s', '%(result)s')" % {
-            'query': query,
-            'result': result})
+        cursor.execute("INSERT INTO CachedQueries(Query, Result) VALUES (?,?);", (
+            query, pickle.dumps(result),))
         self.conn.commit()
 
     def query_cache(self, query):
@@ -69,10 +69,13 @@ class CachedOverpassAPI(overpy.Overpass):
         :rtype: ??
         """
         cursor = self.conn.cursor()
-        result = cursor.execute("SELECT Result FROM CachedQueries WHERE Query='%(query)s'" % {
-            'query': query})
+        result = cursor.execute("SELECT Result FROM CachedQueries WHERE Query=?", (query,))
 
-        return result.fetchone()
+        binary_result = result.fetchone()
+        if binary_result is None:
+            return None
+
+        return pickle.loads(binary_result[0])
 
     def cache_is_empty(self):
         """

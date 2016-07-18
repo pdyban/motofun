@@ -15,14 +15,13 @@ class TestCachedAPI(unittest.TestCase):
         self.api.clear_cache()
         self.assertEqual(self.api.cache_is_empty(), True)
 
-    # @todo: design a way to convert overpass results to json
-    @unittest.skip
     def test_cache_stores_queries(self):
         query = "way(47081339);out;"
         res = self.api.query(query)
         self.assertEqual(self.api.cache_is_empty(), False)
         self.assertNotEqual(self.api.query_cache(query), None)
         self.assertEqual(len(self.api.query_cache(query).ways), len(res.ways))
+        self.assertEqual(len(self.api.query_cache(query).nodes), len(res.nodes))
 
     def test_cache_stores_query_only_once(self):
         query = "way(47081339);out;"

@@ -1,4 +1,5 @@
 from roadgraph import RoadGraph
+from cachedoverpassapi import CachedOverpassAPI
 
 
 class RoadCollector(object):
@@ -14,8 +15,7 @@ class QueryRoadCollector(RoadCollector):
         super().__init__()
 
     def get_roads(self, query):
-        import overpy
-        api = overpy.Overpass()
+        api = CachedOverpassAPI('cache.sqlite')
         result = api.query(query)
 
         nodes = []
