@@ -5,6 +5,9 @@ import os
 
 
 class CachedOverpassAPI(overpy.Overpass):
+    """
+    Cached interface to online Overpass API. Stores queries' results in cache.
+    """
     def __init__(self, dbfile, verbose=False, read_chunk_size=None, delete_on_destroyed=False):
         """
         :param dbfile: path to dbfile file that stores the cache
