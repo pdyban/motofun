@@ -5,11 +5,12 @@ import os
 
 class TestCachedAPI(unittest.TestCase):
     def setUp(self):
-        self.api = CachedOverpassAPI('cache.sqlite')
+        self.api = CachedOverpassAPI('cache.sqlite', verbose=True, delete_on_destroyed=True)
         self.api.clear_cache()
 
     def tearDown(self):
-        os.remove('cache.sqlite')
+        # os.remove('cache.sqlite')
+        pass
 
     def test_cache_is_empty(self):
         self.api.clear_cache()
@@ -20,8 +21,7 @@ class TestCachedAPI(unittest.TestCase):
         res = self.api.query(query)
         self.assertEqual(self.api.cache_is_empty(), False)
         self.assertNotEqual(self.api.query_cache(query), None)
-        self.assertEqual(len(self.api.query_cache(query).ways), len(res.ways))
-        self.assertEqual(len(self.api.query_cache(query).nodes), len(res.nodes))
+        self.assertEqual(len(self.api.query_cache(query)), len(res))
 
     def test_cache_stores_query_only_once(self):
         query = "way(47081339);out;"

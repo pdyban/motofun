@@ -18,23 +18,11 @@ class QueryRoadCollector(RoadCollector):
         api = CachedOverpassAPI('cache.sqlite')
         result = api.query(query)
 
-        nodes = []
-
         # store waypoints as a graph
         g = RoadGraph()
 
-        for way in result.ways:
-            # print("Name: %s" % way.tags.get("name", "n/a"))
-            # print("\tHighway: %s" % way.tags.get("highway", "n/a"))
-
-            nodes_ = []
-            for node in way.get_nodes(resolve_missing=True):
-                nodes_.append((node.lat, node.lon,))
-
-            nodes.append(nodes_)
-
-            # store waypoints as a graph
-            g.append_way(nodes_)
+        for way in result:
+            g.append_way(way)
 
         return g
 

@@ -1,19 +1,56 @@
 import overpy
 import sqlite3
 import pickle
+import os
 
 
 class CachedOverpassAPI(overpy.Overpass):
-    def __init__(self, dbfile, read_chunk_size=None):
+    def __init__(self, dbfile, verbose=False, read_chunk_size=None, delete_on_destroyed=False):
         """
         :param dbfile: path to dbfile file that stores the cache
+        :param verbose: should print debugging messages
+        :param read_chunk_size: see overpy.Overpass.__init__()
+        :param delete_on_destroyed: should delete sqlite file when cache is destroyed
         """
         super().__init__(read_chunk_size)
 
+        self.dbfile = dbfile
         self.conn = None
         self.cursor = None  # database cursor for executing queries
+        self.verbose = verbose
+        self.delete_on_destroyed = delete_on_destroyed
 
-        self.connect_to_db(dbfile)
+        self.print_verbose("Creating new cached DB interface")
+
+        self.connect_to_db(self.dbfile)
+
+    def __del__(self):
+        self.print_verbose("Destroying cached DB interface")
+        self.disconnect_from_db(self.dbfile)
+        if self.delete_on_destroyed:
+            self.print_verbose("Removing cache DB file", self.dbfile)
+            from warnings import warn
+            warn('''Cache DB file at {} cannot be deleted. Not yet implemented due to concurrency issues.''' \
+                 .format(self.dbfile))
+            # os.remove(self.dbfile)
+
+    def print_verbose(self, *args):
+        if self.verbose:
+            print(*args)
+
+    def connect_to_db(self, dbfile):
+        """
+        Connects to cache DB given by dbfile.
+
+        :param dbfile: path to dbfile (sqlite)
+        """
+        self.print_verbose("Connecting to local cache DB")
+        self.conn = sqlite3.connect(dbfile)
+        self.create_empty_cache()  # will quietly do nothing if cache table already exists
+
+    def disconnect_from_db(self, dbfile):
+        self.print_verbose("Disconnecting from local cache DB")
+        self.conn.close()
 
     def clear_cache(self):
         """
@@ -30,15 +67,6 @@ class CachedOverpassAPI(overpy.Overpass):
         cursor = self.conn.cursor()
         cursor.execute("CREATE TABLE IF NOT EXISTS CachedQueries (Query, Result )")
 
-    def connect_to_db(self, dbfile):
-        """
-        Connects to cache DB given by dbfile.
-
-        :param dbfile: path to dbfile (sqlite)
-        """
-        self.conn = sqlite3.connect(dbfile)
-        self.create_empty_cache()  # will quietly do nothing if cache table already exists
-
     def query(self, query):
         """
         Executes the query and stores the result in the cache DB
@@ -49,17 +77,12 @@ class CachedOverpassAPI(overpy.Overpass):
         if result is not None:
             return result
 
-        # debugging
-        # return overpy.Result()
+        self.print_verbose('Processing query online', query)
         result = super().query(query)
-        self.store_to_cache(query, result)
-        return result
-
-    def store_to_cache(self, query, result):
-        cursor = self.conn.cursor()
-        cursor.execute("INSERT INTO CachedQueries(Query, Result) VALUES (?,?);", (
-            query, pickle.dumps(result),))
-        self.conn.commit()
+        result.api = super()  # important for resolution of missing nodes
+        processed_result = self.process_result(result)
+        self.store_to_cache(query, processed_result)
+        return processed_result
 
     def query_cache(self, query):
         """
@@ -68,14 +91,35 @@ class CachedOverpassAPI(overpy.Overpass):
         :return: result
         :rtype: ??
         """
+        self.print_verbose('Query cache', query)
         cursor = self.conn.cursor()
         result = cursor.execute("SELECT Result FROM CachedQueries WHERE Query=?", (query,))
 
         binary_result = result.fetchone()
         if binary_result is None:
+            self.print_verbose('Returning from Overpass online DB')
             return None
 
+        self.print_verbose('Returning from local cache')
         return pickle.loads(binary_result[0])
+
+    def store_to_cache(self, query, result):
+        cursor = self.conn.cursor()
+        cursor.execute("INSERT INTO CachedQueries(Query, Result) VALUES (?,?);", (
+            query, pickle.dumps(result),))
+        self.conn.commit()
+
+    def process_result(self, result):
+        """
+        Processed the result from overpass format to a Python standard format.
+        """
+        nodes = []
+        for way in result.ways:
+            nodes_ = []
+            for node in way.get_nodes(resolve_missing=True):
+                nodes_.append((node.lat, node.lon,))
+            nodes.append(nodes_)
+        return nodes
 
     def cache_is_empty(self):
         """
