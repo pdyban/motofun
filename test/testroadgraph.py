@@ -139,3 +139,17 @@ class TestRoadGraph(unittest.TestCase):
         graph.append_way([(4, 4), (3, 3)])
         simplified_graph = graph.simplify()
         self.assertEqual(len(simplified_graph), 2)  # should keep one segment
+
+    def test_edges_attribute(self):
+        edges = self.graph.edges()
+        self.assertIn([(0, 1), (0, 2)], edges)
+        self.assertIn([(3, 2), (3, 3)], edges)
+        self.assertIn([(3, 2), (4, 3)], edges)
+        self.assertIn([(0, 0), (0, 1)], edges)
+        self.assertIn([(0, 0), (1, 1)], edges)
+        self.assertIn([(0, 0), (2, 1)], edges)
+        self.assertIn([(0, 2), (0, 3)], edges)
+        self.assertIn([(1, 1), (1, 2)], edges)
+        self.assertIn([(1, 1), (3, 2)], edges)
+        self.assertIn([(1, 1), (2, 2)], edges)
+        self.assertEqual(len(edges), 2*10)  # double the number because the graph is double-sided directed

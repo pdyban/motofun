@@ -11,6 +11,14 @@ class RoadGraph(defaultdict):
     def __init__(self, memo=None):
         super().__init__(dict)
 
+    def edges(self):
+        """
+        Returns a list of all edges in the graph.
+
+        :rtype: list
+        """
+        return [s for s in self.traverse_paths()]
+
     def append_way(self, nodes):
         """
         Stores list of waypoints.
