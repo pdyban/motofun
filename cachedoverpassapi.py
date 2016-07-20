@@ -38,8 +38,14 @@ class CachedOverpassAPI(overpy.Overpass):
             # os.remove(self.dbfile)
 
     def print_verbose(self, *args):
+        """
+        Prints a message only if init'd in verbose mode.
+
+        :param args: the variable-length list of arguments to print
+        """
         if self.verbose:
-            print(*args)
+            #print(*args)
+            return ''.format(*args)
 
     def connect_to_db(self, dbfile):
         """
