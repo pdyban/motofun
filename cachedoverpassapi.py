@@ -44,8 +44,7 @@ class CachedOverpassAPI(overpy.Overpass):
         :param args: the variable-length list of arguments to print
         """
         if self.verbose:
-            #print(*args)
-            return ''.format(*args)
+            print(*args)
 
     def connect_to_db(self, dbfile):
         """
