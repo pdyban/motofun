@@ -133,7 +133,7 @@ class TestRoadGraph(unittest.TestCase):
         simplified_graph = graph.simplify()
         self.assertEqual(len(simplified_graph), 2)  # should simplify graph to one segment
 
-    def test_simplify_raph_with_multiple_directions(self):
+    def test_simplify_graph_with_multiple_directions(self):
         graph = RoadGraph()
         graph.append_way([(0, 0), (1, 1), (2, 2), (3, 3)])
         graph.append_way([(4, 4), (3, 3)])
