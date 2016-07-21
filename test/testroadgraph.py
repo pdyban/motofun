@@ -153,3 +153,17 @@ class TestRoadGraph(unittest.TestCase):
         self.assertIn([(1, 1), (3, 2)], edges)
         self.assertIn([(1, 1), (2, 2)], edges)
         self.assertEqual(len(edges), 2*10)  # double the number because the graph is double-sided directed
+
+    def test_dfs(self):
+        paths = self.graph.dfs(node=(0, 0), skip_history=3)
+
+        allowed_paths = []
+        allowed_paths.append([(0, 0), (0, 1), (0, 2), (0, 3)])
+        allowed_paths.append([(0, 0), (1, 1), (1, 2)])
+        allowed_paths.append([(0, 0), (1, 1), (2, 2)])
+        allowed_paths.append([(0, 0), (1, 1), (3, 2), (3, 3)])
+        allowed_paths.append([(0, 0), (1, 1), (3, 2), (4, 3)])
+        allowed_paths.append([(0, 0), (2, 1)])
+
+        for path in paths:
+            self.assertIn(path, allowed_paths)

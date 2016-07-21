@@ -148,3 +148,34 @@ class RoadGraph(defaultdict):
                 del simplified_graph[next_node][path_to_remove[-1]]
 
         return simplified_graph
+
+    def dfs(self, node, ignore=None, skip_history=0):
+        """
+        Implements depth-first search with some modifications for RoadGraph.
+
+        :param node: the node where the DFS should start
+        :param skip_history: number of steps back in history that cannot be visited
+        :param ignore: sequence of nodes that may not be revisited
+        :return: list of nodes
+        :rtype: iterator
+        """
+        # if node is None:
+        #     for node in self:
+        #         for path in self.dfs(node, skip_history=skip_history):
+        #             yield path
+        #
+        # el
+        if ignore is None:
+            ignore = []
+
+        if len(self[node]) == 1:
+            yield [node]  # node has no children
+
+        else:
+            for child in self[node]:
+                if child in ignore:
+                    continue
+
+                ignore_seq = ignore[-skip_history+1:] + [node]
+                for path in self.dfs(child, skip_history=skip_history, ignore=ignore_seq):
+                    yield [node] + path
