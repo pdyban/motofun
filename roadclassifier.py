@@ -11,11 +11,12 @@ class RoadClassifier(object):
     def __init__(self):
         super().__init__()
 
-    def get_classification(self, nodes):
+    def get_classification(self, graph):
         """
         Classifies list of nodes into fun classes.
 
-        @todo: re-consider function signature here, perhaps replace nodes with a specific class
+        :param graph: road graph
+        :type graph: RoadGraphX
         """
         raise NotImplemented("Implement me in children!")
 
@@ -98,9 +99,34 @@ class VectorAngleRoadClassifier(RoadClassifier):
         return road_graph
 
 
-class TriangleRoadClassifier(RoadClassifier):
+class RoadTypeClassifier(RoadClassifier):
+    """
+    Classifies road based on their properties (max speed, residential location etc.)
+    """
     def __init__(self):
         super().__init__()
 
-    def get_classification(self, nodes):
-        raise NotImplemented("Implement me!")
+    def get_classification(self, graph):
+        for start, finish, edge_data in graph.graph.edges(data=True):
+            fun_factor = 100.0  # best is 0.0, worst is 100.0
+            max_speed = edge_data['maxspeed']
+            if max_speed is None:  # max speed is not known
+                fun_factor = 100.0
+            else:
+                max_speed = int(max_speed)
+                if int(max_speed) < 31:
+                    fun_factor = 100.0  # worst road type ever!
+                elif int(max_speed) < 51:
+                    fun_factor = 80.0  # might be a curvy road, but usually is boring
+                elif max_speed > 99:  # the best type of roads!
+                    fun_factor = 25.0
+                else:
+                    fun_factor = 100.0
+
+            residential = edge_data['name'] is not None
+            if residential:
+                fun_factor /= 4  # residential streets are boring
+
+            graph.graph[start][finish]['fun_factor'] = fun_factor
+
+        return graph  # not really necessary!
