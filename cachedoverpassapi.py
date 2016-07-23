@@ -1,14 +1,16 @@
 import overpy
 import sqlite3
 import pickle
-import os
+from roadgraph import RoadGraphX
 
 
 class CachedOverpassAPI(overpy.Overpass):
     """
     Cached interface to online Overpass API. Stores queries' results in cache.
     """
-    def __init__(self, dbfile, verbose=False, read_chunk_size=None, delete_on_destroyed=False):
+    def __init__(self, dbfile, verbose=False, read_chunk_size=None,
+                 # delete_on_destroyed=False
+                 ):
         """
         :param dbfile: path to dbfile file that stores the cache
         :param verbose: should print debugging messages
@@ -21,7 +23,7 @@ class CachedOverpassAPI(overpy.Overpass):
         self.conn = None
         self.cursor = None  # database cursor for executing queries
         self.verbose = verbose
-        self.delete_on_destroyed = delete_on_destroyed
+        # self.delete_on_destroyed = delete_on_destroyed
 
         self.print_verbose("Creating new cached DB interface")
 
@@ -30,12 +32,12 @@ class CachedOverpassAPI(overpy.Overpass):
     def __del__(self):
         self.print_verbose("Destroying cached DB interface")
         self.disconnect_from_db(self.dbfile)
-        if self.delete_on_destroyed:
-            self.print_verbose("Removing cache DB file", self.dbfile)
-            from warnings import warn
-            warn('''Cache DB file at {} cannot be deleted. Not yet implemented due to concurrency issues.''' \
-                 .format(self.dbfile))
-            # os.remove(self.dbfile)
+        # if self.delete_on_destroyed:
+        #     self.print_verbose("Removing cache DB file", self.dbfile)
+        #     from warnings import warn
+        #     warn('''Cache DB file at {} cannot be deleted. Not yet implemented due to concurrency issues.''' \
+        #          .format(self.dbfile))
+        #     # os.remove(self.dbfile)
 
     def print_verbose(self, *args):
         """
@@ -96,8 +98,8 @@ class CachedOverpassAPI(overpy.Overpass):
         """
         Executes a query in the cache DB.
 
-        :return: result
-        :rtype: ??
+        :return: the road graph, if available; otherwise, None
+        :rtype: RoadGraphX
         """
         self.print_verbose('Query cache', query)
         cursor = self.conn.cursor()
@@ -121,13 +123,17 @@ class CachedOverpassAPI(overpy.Overpass):
         """
         Processed the result from overpass format to a Python standard format.
         """
-        nodes = []
+        # nodes = []
+        graph = RoadGraphX()
         for way in result.ways:
             nodes_ = []
+            # print(way.tags.get('maxspeed', None), way.tags.get('name', None))
             for node in way.get_nodes(resolve_missing=True):
-                nodes_.append((node.lat, node.lon,))
-            nodes.append(nodes_)
-        return nodes
+                nodes_.append((node.lon, node.lat,))
+
+            graph.append_road(way.tags, nodes_)
+            # nodes.append(nodes_)
+        return graph
 
     def cache_is_empty(self):
         """
