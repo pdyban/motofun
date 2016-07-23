@@ -1,6 +1,5 @@
 import unittest
 from cachedoverpassapi import CachedOverpassAPI
-import os
 
 
 class TestCachedAPI(unittest.TestCase):
@@ -9,6 +8,7 @@ class TestCachedAPI(unittest.TestCase):
         self.api.clear_cache()
 
     def tearDown(self):
+        # may remove the sqlite, if necessary
         # os.remove('cache.sqlite')
         pass
 
@@ -21,7 +21,8 @@ class TestCachedAPI(unittest.TestCase):
         res = self.api.query(query)
         self.assertEqual(self.api.cache_is_empty(), False)
         self.assertNotEqual(self.api.query_cache(query), None)
-        self.assertEqual(len(self.api.query_cache(query)), len(res))
+        self.assertEqual(self.api.query_cache(query).num_edges(), res.num_edges())
+        self.assertEqual(self.api.query_cache(query).num_nodes(), res.num_nodes())
 
     def test_cache_stores_query_only_once(self):
         query = "way(47081339);out;"
@@ -35,3 +36,13 @@ class TestCachedAPI(unittest.TestCase):
         self.api.clear_cache()
         query = "way(47081339);out;"
         self.assertIs(self.api.query_cache(query), None)
+
+    def test_cache_ignores_newlines(self):
+        self.api.clear_cache()
+        query = """way(47081339);
+                out;"""
+        res = self.api.query(query)
+        self.assertIsNotNone(res)
+        self.assertIsNot(self.api.query_cache(query), None)
+        self.assertIsNot(self.api.query_cache(query.replace('\n', '')), None)
+
