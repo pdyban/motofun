@@ -1,5 +1,6 @@
 from collections import defaultdict
 from copy import deepcopy
+import networkx as nx
 
 
 class RoadGraph(defaultdict):
@@ -179,3 +180,66 @@ class RoadGraph(defaultdict):
                 ignore_seq = ignore[-skip_history+1:] + [node]
                 for path in self.dfs(child, skip_history=skip_history, ignore=ignore_seq):
                     yield [node] + path
+
+
+class RoadGraphX(object):
+    """
+    Stores roads in a graph.
+    """
+    def __init__(self):
+        super().__init__()
+        self.graph = nx.Graph()
+
+    def append_road(self, tags, nodes):
+        """
+        Adds a road to the graph.
+
+        :param tags: a list of tags that describe the road (e.g. the name, maxspeed and other parameters)
+        :type tags: dict
+        :param nodes: list of waypoints aka nodes
+        :type nodes: list
+        :return: ???
+        """
+        for start, finish in zip(nodes[:-1], nodes[1:]):
+            self.graph.add_edge(start, finish,
+                    maxspeed=tags.get('maxspeed', None),
+                    name=tags.get('name', None))
+        # self.graph.add_nodes_from(nodes,
+        #                           maxspeed=tags.get('maxspeed', None),
+        #                           name=tags.get('name', None))
+
+    def edges(self):
+        """
+        Returns all road segments in the road graph.
+
+        :return: the edges aka the road segments
+        :rtype: list
+        """
+        return self.graph.edges()
+
+    def num_edges(self):
+        """
+        Returns total number of road segments in the road graph.
+
+        :return: number of edges aka road segments
+        :rtype: int
+        """
+        return self.graph.number_of_edges()
+
+    def nodes(self):
+        """
+        Returns all waypoints in the road graph.
+
+        :return: the nodes aka the waypoints
+        :rtype: list
+        """
+        return self.graph.nodes()
+
+    def num_nodes(self):
+        """
+        Returns total number of waypoints in the road graph.
+
+        :return: number of nodes aka waypoints
+        :rtype: int
+        """
+        return self.graph.number_of_nodes()
