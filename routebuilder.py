@@ -3,16 +3,21 @@ from math import log
 
 
 class RouteBuilder(object):
-    """contructs a route along the classified list of nodes accounting for total length and fun_factor"""
-    def __init__(self):
+    """
+    Contructs a route that fulfills certain criteria.
+    """
+    def __init__(self, graph):
+        """
+        :param graph: the graph that represents the road system
+        :type graph: RoadGraph
+        """
         super().__init__()
+        self.graph = graph
 
-    def build(self, graph, *args, **kwargs):
+    def build(self, *args, **kwargs):
         """
         Constructs a route in the given graph provided the options.
 
-        :param graph: the graph that represents the road system
-        :type graph: RoadGraph
         :return: list of waypoints that constitute the route
         """
         raise NotImplemented("Implement me in children!")
@@ -22,16 +27,14 @@ class ShortestPathRouteBuilder(RouteBuilder):
     """
     Constructs the shortest path in the road graph.
     """
-    def build(self, graph, source, target):
+    def build(self, source, target):
         """
         Constructs the shortest path in the given graph
         that runs from the source to the target node.
 
-        :param graph: the graph that represents the road system
-        :type graph: RoadGraph
         :return: list of waypoints that constitute the shortest path
         """
-        return self.shortestPath(graph, source, target)
+        return self.shortestPath(self.graph, source, target)
 
     def shortestPath(self, G, start, end):
         """
@@ -61,3 +64,27 @@ class ShortestPathRouteBuilder(RouteBuilder):
             for (v2, cost2) in G[v1].items():
                 if v2 not in visited:
                     heapq.heappush(q, (cost + cost2, v2, path))
+
+
+class TimedRouteBuilder(RouteBuilder):
+    """
+    Constructs a route that is limited by driving time and begins and ends in the same point.
+    """
+    def __init__(self, graph, min_time, max_time, must_visit_nodes):
+        """
+
+        :param must_visit_nodes: waypoints that _must_ be included in the route, e.g. important sights.
+        :type must_visit_nodes: list
+        :param min_time: minimal journey time
+        :type min_time: float (minutes)
+        :param max_time: maximal journey time
+        :type max_time: float (minutes)
+        :return: the path that fulfills all criteria
+        """
+        super().__init__(graph)
+        self.min_time = min_time
+        self.max_time = max_time
+        self.must_visit_nodes = must_visit_nodes
+
+    def build(self, *args, **kwargs):
+        raise NotImplementedError("Not yet implemented!")
