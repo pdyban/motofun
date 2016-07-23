@@ -31,12 +31,12 @@ class QueryRoadCollector(RoadCollector):
         result = api.query(query)
 
         # store waypoints as a graph
-        g = RoadGraph()
+        # g = RoadGraph()
+        #
+        # for way in result:
+        #     g.append_way(way)
 
-        for way in result:
-            g.append_way(way)
-
-        return g
+        return result
 
 
 class BoundingBoxRoadCollector(RoadCollector):
