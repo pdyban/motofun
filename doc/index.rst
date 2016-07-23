@@ -6,6 +6,12 @@
 Welcome to Motofun's documentation!
 ===================================
 
+The projects uses extensively Overpass API and Open Street Maps database.
+
+    - http://wiki.openstreetmap.org/wiki/Key:place
+    - http://overpass-turbo.eu
+    - https://github.com/jwass/mplleaflet
+
 
 Contents:
 
