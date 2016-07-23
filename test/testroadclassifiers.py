@@ -11,7 +11,7 @@ class TestRoadClassifiers(unittest.TestCase):
         self.road_graph = QueryRoadCollector().get_roads(query)
 
     def test_vector_angle_classifier(self):
-        graph = VectorAngleRoadClassifier().get_classification(self.road_graph)
+        graph = VectorAngleRoadClassifier().apply(self.road_graph)
         self.assertEqual(len(graph), 57)  # consists of list of road points aka nodes
         self.assertIsInstance(graph, dict)
         # for node in graph:

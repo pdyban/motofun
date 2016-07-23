@@ -17,11 +17,11 @@ class TestRouteBuilders(unittest.TestCase):
         self.graph.append_way([(3, 2), (4, 3)])
 
         classifier = VectorAngleRoadClassifier()
-        self.classified_graph = classifier.get_classification(self.graph)
+        self.classified_graph = classifier.apply(self.graph)
 
         # query = """way(47081339);out;"""
         # self.nodes = QueryRoadCollector().get_roads(query)
-        # self.classes = VectorAngleRoadClassifier().get_classification(self.nodes)
+        # self.classes = VectorAngleRoadClassifier().apply(self.nodes)
 
     def test_build_shortest_route(self):
         rb = ShortestPathRouteBuilder()

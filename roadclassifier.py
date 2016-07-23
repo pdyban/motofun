@@ -11,9 +11,12 @@ class RoadClassifier(object):
     def __init__(self):
         super().__init__()
 
-    def get_classification(self, graph):
+    def apply(self, graph):
         """
-        Classifies list of nodes into fun classes.
+        Applies a classification algorithm to list of edges.
+
+        This function computes weight attribute for each node in the graph.
+        It should work without copying the input graph, but may return a copy of the graph, if desired.
 
         :param graph: road graph
         :type graph: RoadGraphX
@@ -25,7 +28,7 @@ class VectorAngleRoadClassifier(RoadClassifier):
     def __init__(self):
         super().__init__()
 
-    def get_classification(self, road_graph):
+    def apply(self, road_graph):
         """not finished yet"""
 
         def calculate_angle(p0, p1, p2):
@@ -106,7 +109,7 @@ class RoadTypeClassifier(RoadClassifier):
     def __init__(self):
         super().__init__()
 
-    def get_classification(self, graph):
+    def apply(self, graph):
         for start, finish, edge_data in graph.graph.edges(data=True):
             fun_factor = 100.0  # best is 0.0, worst is 100.0
             max_speed = edge_data['maxspeed']
